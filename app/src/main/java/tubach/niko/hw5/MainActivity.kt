@@ -3,16 +3,16 @@ package tubach.niko.hw5
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import tubach.niko.hw5.ui.theme.HW5Theme
 
 class MainActivity : ComponentActivity() {
+    private val viewModel by viewModels<AliensViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -22,9 +22,19 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    //http://javadude.com/aliens/n.json
+                    viewModel.startAlienReporting()
+                    AlienUi(viewModel)
                 }
             }
         }
     }
+}
+
+@Composable
+fun AlienUi(
+    viewModel: AliensViewModel
+) {
+
+
+    // Use the alienAlertState to display UFOs and lines on the map
 }
