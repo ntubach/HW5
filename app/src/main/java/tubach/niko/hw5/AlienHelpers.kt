@@ -40,8 +40,6 @@ class AlienAlerter(
                     // Capture our alien message in the Alien Alert emit
                     val ufoPositions = response.body() ?: emptyList()
                     _alerts.value = AlienAlert(ufoPositions)
-                    println("Received response: $ufoPositions")
-
                 } else if (response.code() == HttpURLConnection.HTTP_NOT_FOUND) {
                     // Break the loop when we see a 404 endpoint
                     break

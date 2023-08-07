@@ -9,15 +9,15 @@ import kotlinx.coroutines.flow.map
 
 class AliensViewModel : ViewModel() {
     private val alienAlerter = AlienAlerter(viewModelScope)
-    private var _ufosAndLines = mutableMapOf<Int, UfoAndLines>()
+    private var _ufosAndLinesStore = mutableMapOf<Int, UfoAndLines>()
 
-    val ufosAndLines: Flow<Map<Int, UfoAndLines>> = alienAlerter.alerts.map { alienAlert ->
+    private val _ufosAndLines: Flow<Map<Int, UfoAndLines>> = alienAlerter.alerts.map { alienAlert ->
         // Copy our permanent map of UFOs
-        val ufosMap = _ufosAndLines
+        val ufosMap = _ufosAndLinesStore
 
         // Set all our activity to false so new emit can set only active UFOs to true
-        _ufosAndLines.forEach { (key, value) ->
-            _ufosAndLines[key] = value.copy(isActive = false)
+        _ufosAndLinesStore.forEach { (key, value) ->
+            _ufosAndLinesStore[key] = value.copy(isActive = false)
         }
 
         //Iterate over the emit
@@ -41,11 +41,13 @@ class AliensViewModel : ViewModel() {
             ufosMap[ufoPosition.ship] = tmpUfo
         }
         // Update our holder map with new updates
-        _ufosAndLines = ufosMap
+        _ufosAndLinesStore = ufosMap
 
         // Our val is the object
         ufosMap
     }
+    val ufosAndLines: Flow<Map<Int, UfoAndLines>>
+        get() = _ufosAndLines
 
     fun startAlienReporting() {
         alienAlerter.startReporting()

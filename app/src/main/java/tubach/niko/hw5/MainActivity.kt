@@ -110,7 +110,7 @@ fun AlienUi(
                             CameraUpdateFactory.newLatLngZoom(
                                 hw5Start,
                                 16f
-                            ), 1000
+                            ), 400
                         )
                     }
                 }
@@ -171,7 +171,7 @@ fun AlienUi(
                                             CameraUpdateFactory.newLatLngBounds(
                                                 bounds.build(),
                                                 boundsPadding.toInt(),
-                                            ), 1000
+                                            ), 900
                                         )
                                     }
                                 }
