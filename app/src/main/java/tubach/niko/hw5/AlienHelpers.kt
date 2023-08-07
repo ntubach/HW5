@@ -19,11 +19,9 @@ data class UfoPosition(
     val ship: Int = 0,
     val lat: Double = 0.0,
     val lon: Double = 0.0
-) {
-}
+)
 
-class AlienAlert(val ufoPositions: List<UfoPosition> = emptyList()) {
-}
+data class AlienAlert(val ufoPositions: List<UfoPosition> = emptyList())
 
 class AlienAlerter(
     private val coroutineScope: CoroutineScope
@@ -41,9 +39,10 @@ class AlienAlerter(
                 if (response.isSuccessful) {
                     // Capture our alien message in the Alien Alert emit
                     val ufoPositions = response.body() ?: emptyList()
-                    _alerts.emit(AlienAlert(ufoPositions))
+                    _alerts.value = AlienAlert(ufoPositions)
                     println("Received response: $ufoPositions")
-                } else if (response.code() == HttpURLConnection.HTTP_NOT_FOUND){
+
+                } else if (response.code() == HttpURLConnection.HTTP_NOT_FOUND) {
                     // Break the loop when we see a 404 endpoint
                     break
                 } else {
