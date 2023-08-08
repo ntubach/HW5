@@ -101,10 +101,13 @@ fun AlienUi(
         val context = LocalContext.current
         var ufoIcon by remember { mutableStateOf<BitmapDescriptor?>(null) }
         val scope = rememberCoroutineScope()
+        var initialBoundsSet by remember { mutableStateOf(false) }
 
+        // This launched effect is a safety for making sure the map starts in a sane location
         LaunchedEffect(key1 = ufosAndLinesState) {
             ufosAndLinesState.let { ufos ->
-                if (ufos.isEmpty()) {
+                if (ufos.isEmpty() && !initialBoundsSet) {
+                    initialBoundsSet = true
                     run {
                         cameraPositionState.animate(
                             CameraUpdateFactory.newLatLngZoom(
@@ -131,6 +134,7 @@ fun AlienUi(
                             onMapLoaded = {
                                 mapLoaded = true
                                 scope.launch(Dispatchers.IO) {
+                                    // Load our nice bitmap image of the ufo to the composable GMap
                                     ufoIcon =
                                         context.loadBitmapDescriptor(
                                             R.drawable.ic_ufo_flying
@@ -143,9 +147,11 @@ fun AlienUi(
                                 .weight(1f),
                         ) {
                             ufosAndLinesState.let { ufos ->
+                                // Use the Builder pattern for bounds to save looping
                                 val bounds = LatLngBounds.Builder()
                                 ufos.forEach { (key, value) ->
                                     bounds.include(value.lastPosition.position)
+                                    // Only put down markers for active UFOs
                                     if (value.isActive) {
                                         MarkerInfoWindowContent(
                                             state = value.lastPosition,
@@ -155,6 +161,7 @@ fun AlienUi(
                                         )
                                     }
 
+                                    // Draw Polylines for each UFO's line list
                                     value.lines.forEach { line ->
                                         bounds.include(line.startLatLng)
                                         bounds.include(line.endLatLng)
@@ -165,6 +172,7 @@ fun AlienUi(
                                         )
                                     }
                                 }
+                                // Assuming we saw a UFO, update the bounds of the map using the Builder
                                 if (ufos.isNotEmpty()) {
                                     scope.launch {
                                         cameraPositionState.animate(

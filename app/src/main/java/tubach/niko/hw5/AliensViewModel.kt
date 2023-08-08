@@ -20,7 +20,7 @@ class AliensViewModel : ViewModel() {
             _ufosAndLinesStore[key] = value.copy(isActive = false)
         }
 
-        //Iterate over the emit
+        // Iterate over the emit
         for (ufoPosition in alienAlert.ufoPositions) {
             // Local temp for current Position
             val updatePos = LatLng(ufoPosition.lat, ufoPosition.lon)
@@ -56,9 +56,7 @@ class AliensViewModel : ViewModel() {
 
 // Helpful data classes for holding an individual UFOs state (activity and lines)
 data class UfoAndLines(
-//    val id: Int = -1,
     var isActive: Boolean = false,
-//    var lastPosition: LatLng = LatLng(0.0, 0.0),
     var lastPosition: MarkerState = MarkerState(LatLng(0.0, 0.0)),
     var lines: MutableList<Line> = ArrayList()
 )

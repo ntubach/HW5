@@ -13,6 +13,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import java.net.HttpURLConnection
 
+// A great URL name, much const, such dude
 const val BASE_URL = "http://javadude.com/"
 
 data class UfoPosition(
@@ -30,11 +31,14 @@ class AlienAlerter(
     val alerts: Flow<AlienAlert>
         get() = _alerts
     private val alienApiService = AlienApiService.create()
+
+    // Just use a simple count for tracking url endpoint due to known constraint
     private var count = 1
 
     fun startReporting() {
         coroutineScope.launch(Dispatchers.IO) {
             while (true) {
+                // Call our Retrofit2 Service to get the next Alien encounter for the Alerter
                 val response = alienApiService.getAliens(count)
                 if (response.isSuccessful) {
                     // Capture our alien message in the Alien Alert emit
@@ -54,7 +58,10 @@ class AlienAlerter(
     }
 }
 
+// Retrofit2 inspiration courtesy of Scott Stanchfield
+// https://gitlab.com/605-686/android-summer-2023/-/blob/main/movies-ui2-rest/repository/src/main/java/com/androidbyexample/movies/repository/MovieApiService.kt
 interface AlienApiService {
+    // GET relies on Retrofit2 conversion to populate the List<UfoPosition>> val automatically upon receive
     @GET("aliens/{id}.json")
     suspend fun getAliens(@Path("id") id: Int): Response<List<UfoPosition>>
 
