@@ -44,7 +44,7 @@ class AliensViewModel : ViewModel() {
         _ufosAndLinesStore = ufosMap
 
         // Our val is the object
-        ufosMap
+        ufosMap.toMap()
     }
     val ufosAndLines: Flow<Map<Int, UfoAndLines>>
         get() = _ufosAndLines
