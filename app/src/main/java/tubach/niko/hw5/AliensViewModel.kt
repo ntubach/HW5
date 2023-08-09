@@ -3,7 +3,6 @@ package tubach.niko.hw5
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.MarkerState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -25,25 +24,23 @@ class AliensViewModel : ViewModel() {
             // Local temp for current Position
             val updatePos = LatLng(ufoPosition.lat, ufoPosition.lon)
             // Either grab the value from the map or create a new one with current Position
-            val tmpUfo = ufosMap[ufoPosition.ship] ?: UfoAndLines(
-                lastPosition = MarkerState(updatePos),
+            val tmpUfo = ufosMap[ufoPosition.ship]?.let {
+                ufosMap[ufoPosition.ship]?.copy(
+                    // Make a copy with updated values
+                    isActive = true, points = it.points + updatePos
+                )
+            } ?: UfoAndLines(
+                // Set UFO to active
+                isActive = true,
+                points = listOf(updatePos)
             )
-            // Set UFO to active
-            tmpUfo.isActive = true
-            // Create a line based on last and current position
-            val line = Line(tmpUfo.lastPosition.position, updatePos)
-            // Only add new lines if the UFO moved (new UFOs will hit this)
-            if (line.startLatLng != line.endLatLng)
-                tmpUfo.lines.add(line)
-            // Replace last known with current position
-            tmpUfo.lastPosition.position = updatePos
             // Place temporary object back into the map
             ufosMap[ufoPosition.ship] = tmpUfo
         }
         // Update our holder map with new updates
         _ufosAndLinesStore = ufosMap
 
-        // Our val is the object
+        // Our val is the object (use toMap b/c we used a mutableMap for simplicity on our data store object)
         ufosMap.toMap()
     }
     val ufosAndLines: Flow<Map<Int, UfoAndLines>>
@@ -56,12 +53,6 @@ class AliensViewModel : ViewModel() {
 
 // Helpful data classes for holding an individual UFOs state (activity and lines)
 data class UfoAndLines(
-    var isActive: Boolean = false,
-    var lastPosition: MarkerState = MarkerState(LatLng(0.0, 0.0)),
-    var lines: MutableList<Line> = ArrayList()
-)
-
-data class Line(
-    val startLatLng: LatLng,
-    val endLatLng: LatLng
+    val isActive: Boolean = false,
+    val points: List<LatLng> = ArrayList()
 )

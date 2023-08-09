@@ -44,6 +44,7 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MarkerInfoWindowContent
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.Dispatchers
@@ -150,27 +151,26 @@ fun AlienUi(
                                 // Use the Builder pattern for bounds to save looping
                                 val bounds = LatLngBounds.Builder()
                                 ufos.forEach { (key, value) ->
-                                    bounds.include(value.lastPosition.position)
+                                    bounds.include(value.points.last())
                                     // Only put down markers for active UFOs
                                     if (value.isActive) {
                                         MarkerInfoWindowContent(
-                                            state = value.lastPosition,
+                                            state = MarkerState(value.points.last()),
                                             icon = ufoIcon,
                                             anchor = Offset(0.5f, 0.5f),
                                             title = "${stringResource(R.string.ufo)} $key",
                                         )
                                     }
 
-                                    // Draw Polylines for each UFO's line list
-                                    value.lines.forEach { line ->
-                                        bounds.include(line.startLatLng)
-                                        bounds.include(line.endLatLng)
-                                        Polyline(
-                                            points = listOf(line.startLatLng, line.endLatLng),
-                                            color = MaterialTheme.colorScheme.primary,
-                                            width = 8f
-                                        )
-                                    }
+                                    // Add points to bounds for camera update
+                                    value.points.forEach{bounds.include(it)}
+                                    // Draw Polylines for each UFO's point list
+                                    Polyline(
+                                        points = value.points,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        width = 8f
+                                    )
+
                                 }
                                 // Assuming we saw a UFO, update the bounds of the map using the Builder
                                 if (ufos.isNotEmpty()) {
